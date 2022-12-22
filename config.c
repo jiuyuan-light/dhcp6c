@@ -214,11 +214,9 @@ configure_interface(iflist)
 	struct cf_namelist *iflist;
 {
 	struct cf_namelist *ifp;
+    struct cf_namelist *ifp_for_ifnames;
 	struct dhcp6_ifconf *ifc;
 	char *cp;
-
-	/* XXX pointer back for use by dhcp6c interface names */
-	ifnames = iflist;
 
 	for (ifp = iflist; ifp; ifp = ifp->next) {
 		struct cf_list *cfl;
@@ -238,7 +236,22 @@ configure_interface(iflist)
 		ifc->next = dhcp6_ifconflist;
 		dhcp6_ifconflist = ifc;
 
+		if ((ifp_for_ifnames = malloc(sizeof(struct cf_namelist))) == NULL) {
+			d_printf(LOG_ERR, FNAME,
+			    "memory allocation for %s failed", ifp->name);
+			goto bad;
+		}
+        /* XXX pointer back for use by dhcp6c interface names */
+        memset(ifp_for_ifnames, 0, sizeof(struct cf_namelist));
+        ifp_for_ifnames->next = ifnames;
+        ifnames = ifp_for_ifnames;
+
 		if ((ifc->ifname = strdup(ifp->name)) == NULL) {
+			d_printf(LOG_ERR, FNAME, "failed to copy ifname");
+			goto bad;
+		}
+
+		if ((ifp_for_ifnames->name = strdup(ifp->name)) == NULL) {
 			d_printf(LOG_ERR, FNAME, "failed to copy ifname");
 			goto bad;
 		}

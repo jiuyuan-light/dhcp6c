@@ -4501,7 +4501,7 @@ $as_echo_n "checking for local DB directory... " >&6; }
 if test "${with_localdbdir+set}" = set; then :
   withval=$with_localdbdir; localdbdir="$withval"
 else
-  localdbdir="/var/db"
+  localdbdir="/var/dhcp6"
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $localdbdir" >&5
